@@ -15,7 +15,7 @@
 #include "util.h"
 #include "exporter.h"
 #include "settings.h"
-#include "goi.h"
+#include "cuda_thread.h"
 
 int readParam(FILE *fp, char **line, size_t *len, int *param);
 int readWorldLayout(FILE *fp, char **line, size_t *len, int *world, int nRows, int nCols);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
     printf("<INPUT_PATH>: %s\n", argv[1]);
     printf("<OUTPUT_PATH>: %s\n", argv[2]);
-    printf("<GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z>: %s\n", argv[3:8]);
+    //printf("<GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z>: %s\n", argv[3:8]);
 
 #if EXPORT_GENERATIONS
     FILE *exportFile = NULL;
@@ -113,11 +113,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Failed to parse <BLOCK_Z> as positive integer. Got '%s'. Aborting...\n", argv[3]);
         exit(EXIT_FAILURE);
     }
-    if (nThreads < 1)
-    {
-        fprintf(stderr, "<NUM_THREADS> has invalid value: %d. Aborting...\n", nThreads);
-        exit(EXIT_FAILURE);
-    }
+    //if (nThreads < 1)
+    //{
+        //fprintf(stderr, "<NUM_THREADS> has invalid value: %d. Aborting...\n", nThreads);
+        //exit(EXIT_FAILURE);
+    //}
 
     // Read nGenerations
     if (readParam(inputFile, &line, &len, &nGenerations) == -1)
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     }
 
     // Read start world
-    startWorld = malloc(sizeof(int) * nRows * nCols);
+    startWorld = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
     if (startWorld == NULL || readWorldLayout(inputFile, &line, &len, startWorld, nRows, nCols) == -1)
     {
         fprintf(stderr, "Failed to read STARTING_WORLD. Aborting...\n");
@@ -162,8 +162,8 @@ int main(int argc, char *argv[])
     }
 
     // Read invasions
-    invasionTimes = malloc(sizeof(int) * nInvasions);
-    invasionPlans = malloc(sizeof(int *) * nInvasions);
+    invasionTimes = static_cast<int *>(malloc(sizeof(int) * nInvasions));
+    invasionPlans = static_cast<int **>(malloc(sizeof(int *) * nInvasions));
     if (invasionTimes == NULL || invasionPlans == NULL)
     {
         fprintf(stderr, "No memory for invasions. Aborting...\n");
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
 
-        invasionPlans[i] = malloc(sizeof(int) * nRows * nCols);
+        invasionPlans[i] = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
         if (invasionPlans[i] == NULL || readWorldLayout(inputFile, &line, &len, invasionPlans[i], nRows, nCols))
         {
             fprintf(stderr, "Failed to read INVASION_PLAN. Aborting...\n");
@@ -268,7 +268,7 @@ int readWorldLayout(FILE *fp, char **line, size_t *len, int *world, int nRows, i
                 return -1;
             }
 
-            setValueAt(world, nRows, nCols, row, col, cell);
+            GlobalsetValueAt(world, nRows, nCols, row, col, cell);
             p = end;
         }
     }

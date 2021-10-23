@@ -2,10 +2,10 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="IntelliStream2 (08ceddb6-ba27-4c8e-9319-20ab76ccda6b)">
+      <paths name="GPU (dedc9404-c644-42ca-9a4d-c42e8caf5117)">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/a2_starter_code" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/tmp.DPPualmF8i" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

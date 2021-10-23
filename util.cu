@@ -14,7 +14,7 @@
  * 
  * -1 is returned if row or col is out of bounds (as specified by nRows and nCols).
  */
-int getValueAt(const int *grid, int nRows, int nCols, int row, int col)
+__device__ int getValueAt(const int *grid, int nRows, int nCols, int row, int col)
 {
     if (row < 0 || row >= nRows || col < 0 || col >= nCols)
     {
@@ -29,7 +29,7 @@ int getValueAt(const int *grid, int nRows, int nCols, int row, int col)
  * 
  * Does nothing if row or col is out of bounds (as specified by nRows and nCols).
  */
-void setValueAt(int *grid, int nRows, int nCols, int row, int col, int val)
+__device__ void setValueAt(int *grid, int nRows, int nCols, int row, int col, const int val)
 {
     if (row < 0 || row >= nRows || col < 0 || col >= nCols)
     {
