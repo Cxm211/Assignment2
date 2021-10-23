@@ -179,6 +179,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
                 if (diedDueToFighting){
                     death[tid]++;
                 }
+                printf("Next: %d", nextState);
                 diedDueToFighting = false;
             }
         }
