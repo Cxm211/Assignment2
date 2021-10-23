@@ -88,8 +88,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 
     // tracks count of each faction adjacent to this cell
     int neighborCounts[MAX_FACTIONS];
-    for(int i = 0; i < MAX_FACTIONS; i++)
+    for(int i = 0; i < MAX_FACTIONS; i++){
         neighborCounts[i] = 0;
+    }
    // memset(neighborCounts, 0, MAX_FACTIONS * sizeof(int));
 
     // count neighbors (and self)
@@ -108,7 +109,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 
     // we counted this cell as its "neighbor"; adjust for this
     neighborCounts[cellFaction]--;
-
+    for(int i = 0; i < MAX_FACTIONS; i++){
+        printf("N: %d", neighborCounts[i]);
+    }
     if (cellFaction == DEAD_FACTION)
     {
         // this is a dead cell; we need to see if a birth is possible:
