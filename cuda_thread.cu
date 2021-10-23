@@ -264,12 +264,28 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        cudaMalloc((void**)&deathNum, num);
 //        cudaMemcpy(deathNum, death, num, cudaMemcpyHostToDevice);
 //
+        printf("HAHA");
+        int *wholeNewWorldCuda;
+        int *worldCuda;
+        int *invCuda;
+
+        cudaMalloc((void**)&wholeNewWorldCuda, sizeof(int) * nRows * nCols);
+        cudaMalloc((void**)&worldCuda, sizeof(int) * nRows * nCols);
+        cudaMalloc((void**)&invCuda, sizeof(int) * nRows * nCols);
+
+        cudaMemcpy(wholeNewWorldCuda, wholeNewWorld, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
+        cudaMemcpy(worldCuda, world, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
+        cudaMemcpy(invCuda, inv, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
+
         dim3 gridDim(GRID_X,GRID_Y,GRID_Z);
         dim3 blockDim(BLOCK_X,BLOCK_Y, BLOCK_Z);
 
-        execute<<<gridDim, blockDim>>> (wholeNewWorld, world, inv, nRows, nCols );
+        execute<<<gridDim, blockDim>>>(wholeNewWorld, world, inv, nRows, nCols );
         cudaDeviceSynchronize();
 
+        cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
+        cudaMemcpy(world, worldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
+        cudaMemcpy(inv, invCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
         printWorld(wholeNewWorld,  nRows,  nCols);
 //        cudaMemcpy(death, deathNum, num, cudaMemcpyDeviceToHost);
         // get new states for each cell
