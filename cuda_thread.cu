@@ -177,6 +177,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
             bool diedDueToFighting;
             if ( id % num == tid){
                 printf("tid: %d , id: %d\n", tid, id);
+                printWorld(currWorld, nRows, nCols);
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
                 printf("NEXT: %d", nextState);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
