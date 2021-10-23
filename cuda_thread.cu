@@ -20,7 +20,7 @@
 /**
  * Specifies the number(s) of live neighbors of the same faction required for a dead cell to become alive.
  */
-__device__ __managed__ volatile int death[1000];
+__device__  int death[1000];
 
 __device__ bool isBirthable(int n)
 {
@@ -305,7 +305,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 #endif
     }
     int host_death[1000];
-    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(1000));
+    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(death));
 
     if (rc != cudaSuccess)
     {
