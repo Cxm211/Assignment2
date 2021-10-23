@@ -279,18 +279,18 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         }
 
         // create the next world state
-        int *wholeNewWorld = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
-        if (wholeNewWorld == NULL)
-        {
-            if (inv != NULL)
-            {
-                free(inv);
-                cudaFree(invCuda);
-            }
-            free(world);
-            cudaFree(worldCuda);
-            return -1;
-        }
+//        int *wholeNewWorld = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
+//        if (wholeNewWorld == NULL)
+//        {
+//            if (inv != NULL)
+//            {
+//                free(inv);
+//                cudaFree(invCuda);
+//            }
+//            free(world);
+//            cudaFree(worldCuda);
+//            return -1;
+//        }
 
 
 //        cudaMalloc((void**)&deathNum, num);
@@ -299,7 +299,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        printf("HAHA\n");
 //        printWorld(world,  nRows,  nCols);
 //        printWorld(wholeNewWorld,  nRows,  nCols);
-        int *wholeNewWorldCuda ;
+        int *wholeNewWorldCuda  = NULL;
         cudaMalloc((void**)&wholeNewWorldCuda, sizeof(int) * nRows * nCols);
 //        for (int row = 0; row < nRows; row++)
 //        {
@@ -340,10 +340,10 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         }
 
         // swap worlds
-        free(world);
+//        free(world);
         cudaFree(worldCuda);
         worldCuda = wholeNewWorldCuda;
-        world = wholeNewWorld;
+//        world = wholeNewWorld;
 
 #if PRINT_GENERATIONS
         printf("\n=== WORLD %d ===\n", i);
@@ -366,7 +366,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         deathToll += host_death[i];
     }
 
-    free(world);
+//    free(world);
     cudaFree(worldCuda);
     return deathToll;
 }
