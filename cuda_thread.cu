@@ -101,7 +101,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
             if (faction >= DEAD_FACTION)
             {
                 neighborCounts[faction]++;
-                printf("NEIGHBOR: ", neighborCounts[faction]);
+                printf("NEIGHBOR: %d", neighborCounts[faction]);
             }
         }
     }
