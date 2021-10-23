@@ -109,9 +109,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 
     // we counted this cell as its "neighbor"; adjust for this
     neighborCounts[cellFaction]--;
-    for(int i = 0; i < MAX_FACTIONS; i++){
-        printf("N: %d", neighborCounts[i]);
-    }
+//    for(int i = 0; i < MAX_FACTIONS; i++){
+//        printf("N: %d", neighborCounts[i]);
+//    }
     if (cellFaction == DEAD_FACTION)
     {
         // this is a dead cell; we need to see if a birth is possible:
@@ -124,7 +124,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
         for (int faction = DEAD_FACTION + 1; faction < MAX_FACTIONS; faction++)
         {
             int count = neighborCounts[faction];
-            printf("COUNT: %d", count);
+//            printf("COUNT: %d", count);
             if (isBirthable(count))
             {
                 newFaction = faction;
@@ -181,9 +181,9 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
             int id = row * nCols + col;
             bool diedDueToFighting;
             if ( id % num == tid){
-                printf("tid: %d , id: %d\n", tid, id);
+                //printf("tid: %d , id: %d\n", tid, id);
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
-                printf("NEXT: %d\n", nextState);
+               // printf("NEXT: %d\n", nextState);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
                 if (diedDueToFighting){
                     death[tid]++;
