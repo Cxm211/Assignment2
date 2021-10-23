@@ -304,16 +304,16 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         exportWorld(world, nRows, nCols);
 #endif
     }
-    int host_death[num];
-    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(host_death));
-
-    if (rc != cudaSuccess)
-    {
-        printf("Could not copy from device. Reason: %s\n", cudaGetErrorString(rc));
-    }
-    for (int i = 0; i < num; i++){
-        deathToll += host_death[i];
-    }
+//    int host_death[num];
+//    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(host_death));
+//
+//    if (rc != cudaSuccess)
+//    {
+//        printf("Could not copy from device. Reason: %s\n", cudaGetErrorString(rc));
+//    }
+//    for (int i = 0; i < num; i++){
+//        deathToll += host_death[i];
+//    }
     free(world);
     return deathToll;
 }
