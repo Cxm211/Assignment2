@@ -150,6 +150,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
     }
 }
 
+__global__ void worldCreation(){
+
+}
 
 __global__ void execute(int *wholeNewWorld, const int *currWorld, const int *invaders, int nRows, int nCols) {
     int tid = (threadIdx.z * blockDim.y * blockDim.x + threadIdx.x * blockDim.y + threadIdx.y) +
@@ -161,7 +164,7 @@ __global__ void execute(int *wholeNewWorld, const int *currWorld, const int *inv
             int id = row * nCols + col;
             bool diedDueToFighting;
             if (id % num == tid) {
-                //printf("tid: %d , id: %d\n", tid, id);
+                // printf("tid: %d , id: %d\n", tid, id);
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
                 // printf("NEXT: %d\n", nextState);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
@@ -225,8 +228,8 @@ int goiCuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int BL
             }
             for (int row = 0; row < nRows; row++) {
                 for (int col = 0; col < nCols; col++) {
-                    GlobalsetValueAt(inv, nRows, nCols, row, col,
-                                     GlobalgetValueAt(invasionPlans[invasionIndex], nRows, nCols, row, col));
+                    globalSetValueAt(inv, nRows, nCols, row, col,
+                                     globalGetValueAt(invasionPlans[invasionIndex], nRows, nCols, row, col));
                 }
             }
             invasionIndex++;
@@ -268,36 +271,19 @@ int goiCuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int BL
         dim3 gridDim(GRID_X, GRID_Y, GRID_Z);
         dim3 blockDim(BLOCK_X, BLOCK_Y, BLOCK_Z);
 
-        execute<<<gridDim, blockDim>>>(wholeNewWorldCuda, worldCuda, invCuda, nRows, nCols);
-        cudaDeviceSynchronize();
-
         cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
         cudaMemcpy(world, worldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
         cudaMemcpy(inv, invCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
 
-//        cudaMemcpy(death, deathNum, num, cudaMemcpyDeviceToHost);
-        // get new states for each cell
-//        for (int row = 0; row < nRows; row++)
-//        {
-//            for (int col = 0; col < nCols; col++)
-//            {
-//                bool diedDueToFighting;
-//                int nextState = getNextState(world, inv, nRows, nCols, row, col, &diedDueToFighting);
-//                setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
-//                if (diedDueToFighting)
-//                {
-//                    deathToll++;
-//                }
-//            }
-//        }
-
-        if (inv != NULL) {
-            free(inv);
-        }
+        if (inv != NULL) free(inv);
 
         // swap worlds
         free(world);
         world = wholeNewWorld;
+
+        // wait for all threads to finish
+        execute<<<gridDim, blockDim>>>(wholeNewWorldCuda, worldCuda, invCuda, nRows, nCols);
+        cudaDeviceSynchronize();
 
 #if PRINT_GENERATIONS
         printf("\n=== WORLD %d ===\n", i);
@@ -308,6 +294,8 @@ int goiCuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int BL
         exportWorld(world, nRows, nCols);
 #endif
     }
+
+    //After all threads finished
     int host_death[1000];
     cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(death));
 
