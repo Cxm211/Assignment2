@@ -16,7 +16,6 @@
 // this macro is here to make the code slightly more readable, not because it can be safely changed to
 // any integer value; changing this to a non-zero value may break the code
 #define DEAD_FACTION 0
-#define NUM_ELEMENTS 5
 
 /**
  * Specifies the number(s) of live neighbors of the same faction required for a dead cell to become alive.
@@ -174,13 +173,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *invaders, int nRows, int nCols ){
     int tid = (threadIdx.z * blockDim.y * blockDim.x + threadIdx.x * blockDim.y + threadIdx.y ) + (blockDim.x * blockDim.y * blockDim.z) * ( blockIdx.x * gridDim.y + blockIdx.y +  blockIdx.z * gridDim.x * gridDim.y );
     int num = gridDim.x * gridDim.y * gridDim.z * blockDim.x * blockDim.y * blockDim.z;
-    for (int row = 0; row < nRows; row++)
-    {
-        for (int col = 0; col < nCols; col++)
-        {
-            setValueAt(wholeNewWorld, nRows, nCols, row, col, 0);
-        }
-    }
+
     for (int row = 0; row < nRows; row++)
     {
         for (int col = 0; col < nCols; col++)
@@ -190,7 +183,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
             if ( id % num == tid){
                 //printf("tid: %d , id: %d\n", tid, id);
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
-               // printf("NEXT: %d\n", nextState);
+                // printf("NEXT: %d\n", nextState);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
                 if (diedDueToFighting){
                     death[tid]++;
@@ -213,6 +206,18 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
     int deathToll = 0;
     int num = GRID_X * GRID_Y * GRID_Z * BLOCK_X * BLOCK_Y * BLOCK_Z;
 
+    int start[1000];
+    int host_death[1000];
+    for (int i = 0; i < num; i++) {
+        start[i] = 0;
+    }
+
+    cudaError_t rc = cudaMemcpyToSymbol(death, &start, sizeof(start));
+
+    if (rc != cudaSuccess)
+    {
+        printf("Could not copy to device. Reason: %s\n", cudaGetErrorString(rc));
+    }
 //    int death[num];
 //    int* deathNum;
 
@@ -250,14 +255,16 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
     {
         // is there an invasion this generation?
         int *inv = NULL;
-        int *invCuda;
+        int *invCuda = NULL;
         if (invasionIndex < nInvasions && i == invasionTimes[invasionIndex])
         {
             // we make a copy because we do not own invasionPlans
             inv = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
+            cudaMalloc((void**)&invCuda, sizeof(int) * nRows * nCols);
             if (inv == NULL)
             {
                 free(world);
+                cudaFree(worldCuda);
                 return -1;
             }
             for (int row = 0; row < nRows; row++)
@@ -267,11 +274,8 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
                     GlobalsetValueAt(inv, nRows, nCols, row, col, GlobalgetValueAt(invasionPlans[invasionIndex], nRows, nCols, row, col));
                 }
             }
-            invasionIndex++;
-            if(invasionIndex == 0){
-                cudaMalloc((void**)&invCuda, sizeof(int) * nRows * nCols);
-            }
             cudaMemcpy(invCuda, inv, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
+            invasionIndex++;
         }
 
         // create the next world state
@@ -295,16 +299,23 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        printf("HAHA\n");
 //        printWorld(world,  nRows,  nCols);
 //        printWorld(wholeNewWorld,  nRows,  nCols);
-        int *wholeNewWorldCuda;
+        int *wholeNewWorldCuda ;
         cudaMalloc((void**)&wholeNewWorldCuda, sizeof(int) * nRows * nCols);
-
+//        for (int row = 0; row < nRows; row++)
+//        {
+//            for (int col = 0; col < nCols; col++)
+//            {
+//                GlobalsetValueAt(wholeNewWorld, nRows, nCols, row, col, 0);
+//            }
+//        }
+//        cudaMemcpy(wholeNewWorldCuda, wholeNewWorld, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
         dim3 gridDim(GRID_X,GRID_Y,GRID_Z);
         dim3 blockDim(BLOCK_X,BLOCK_Y, BLOCK_Z);
 
         execute<<<gridDim, blockDim>>>(wholeNewWorldCuda, worldCuda, invCuda, nRows, nCols);
         cudaDeviceSynchronize();
 
-//        cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
+//     cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
 
 //        cudaMemcpy(death, deathNum, num, cudaMemcpyDeviceToHost);
         // get new states for each cell
@@ -344,16 +355,17 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 #endif
     }
 
-    int host_death[1000];
-    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(death));
+    rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(start));
 
     if (rc != cudaSuccess)
     {
         printf("Could not copy from device. Reason: %s\n", cudaGetErrorString(rc));
     }
+
     for (int i = 0; i < num; i++){
         deathToll += host_death[i];
     }
+
     free(world);
     cudaFree(worldCuda);
     return deathToll;
