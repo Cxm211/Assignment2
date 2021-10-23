@@ -252,7 +252,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         }
 
         // create the next world state
-        void *wholeNewWorld = (malloc(sizeof(int) * nRows * nCols));
+        int *wholeNewWorld = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
         if (wholeNewWorld == NULL)
         {
             if (inv != NULL)
@@ -261,6 +261,13 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
             }
             free(world);
             return -1;
+        }
+        for (int row = 0; row < nRows; row++)
+        {
+            for (int col = 0; col < nCols; col++)
+            {
+                GlobalsetValueAt(wholeNewWorld, nRows, nCols, row, col, 0);
+            }
         }
 
 //        cudaMalloc((void**)&deathNum, num);
