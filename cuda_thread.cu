@@ -120,6 +120,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
         for (int faction = DEAD_FACTION + 1; faction < MAX_FACTIONS; faction++)
         {
             int count = neighborCounts[faction];
+            printf("BIRTH: %s\n", isBirthable(count));
             if (isBirthable(count))
             {
                 newFaction = faction;
@@ -177,9 +178,8 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
             bool diedDueToFighting;
             if ( id % num == tid){
                 printf("tid: %d , id: %d\n", tid, id);
-                printWorld(currWorld, nRows, nCols);
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
-                printf("NEXT: %d", nextState);
+                printf("NEXT: %d\n", nextState);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
                 if (diedDueToFighting){
                     death[tid]++;
