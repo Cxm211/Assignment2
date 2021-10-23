@@ -265,7 +265,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        cudaMemcpy(deathNum, death, num, cudaMemcpyHostToDevice);
 //
         printf("HAHA\n");
-        printWorld(wholeNewWorld,  nRows,  nCols);
+        printWorld(world,  nRows,  nCols);
         int *wholeNewWorldCuda;
         int *worldCuda;
         int *invCuda;
