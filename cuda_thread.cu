@@ -88,7 +88,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 
     // tracks count of each faction adjacent to this cell
     int neighborCounts[MAX_FACTIONS];
-    memset(neighborCounts, 0, MAX_FACTIONS * sizeof(int));
+    for(int i = 0; i < MAX_FACTIONS; i++)
+        neighborCounts[i] = 0;
+   // memset(neighborCounts, 0, MAX_FACTIONS * sizeof(int));
 
     // count neighbors (and self)
     for (int dy = -1; dy <= 1; dy++)
@@ -282,7 +284,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         dim3 gridDim(GRID_X,GRID_Y,GRID_Z);
         dim3 blockDim(BLOCK_X,BLOCK_Y, BLOCK_Z);
 
-        execute<<<gridDim, blockDim>>>(wholeNewWorld, world, inv, nRows, nCols );
+        execute<<<gridDim, blockDim>>>(wholeNewWorld, world, inv, nRows, nCols);
         cudaDeviceSynchronize();
 
         cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
