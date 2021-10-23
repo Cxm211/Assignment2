@@ -264,7 +264,8 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        cudaMalloc((void**)&deathNum, num);
 //        cudaMemcpy(deathNum, death, num, cudaMemcpyHostToDevice);
 //
-        printf("HAHA");
+        printf("HAHA\n");
+        printWorld(wholeNewWorld,  nRows,  nCols);
         int *wholeNewWorldCuda;
         int *worldCuda;
         int *invCuda;
@@ -286,7 +287,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
         cudaMemcpy(world, worldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
         cudaMemcpy(inv, invCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
-        printWorld(wholeNewWorld,  nRows,  nCols);
+
 //        cudaMemcpy(death, deathNum, num, cudaMemcpyDeviceToHost);
         // get new states for each cell
 //        for (int row = 0; row < nRows; row++)
