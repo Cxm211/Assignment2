@@ -280,9 +280,9 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
 //        cudaMalloc((void**)&deathNum, num);
 //        cudaMemcpy(deathNum, death, num, cudaMemcpyHostToDevice);
 //
-        printf("HAHA\n");
-        printWorld(world,  nRows,  nCols);
-        printWorld(wholeNewWorld,  nRows,  nCols);
+//        printf("HAHA\n");
+//        printWorld(world,  nRows,  nCols);
+//        printWorld(wholeNewWorld,  nRows,  nCols);
         int *wholeNewWorldCuda;
         int *worldCuda;
         int *invCuda;
