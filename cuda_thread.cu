@@ -169,6 +169,10 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *invaders, int nRows, int nCols ){
     int tid = (threadIdx.x * blockDim.y + threadIdx.y ) + (blockDim.x * blockDim.y) * ( blockIdx.x * gridDim.y + blockIdx.y +  blockIdx.z * gridDim.x * gridDim.y );
     int num = gridDim.x * gridDim.y * gridDim.z * blockDim.x * blockDim.y * blockDim.z;
+# if __CUDA_ARCH__>=200
+    printf("%d \n", tid);
+
+#endif
     for (int row = 0; row < nRows; row++)
     {
         for (int col = 0; col < nCols; col++)
