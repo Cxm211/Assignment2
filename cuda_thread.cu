@@ -178,7 +178,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
             bool diedDueToFighting;
             if ( id % num == tid){
 # if __CUDA_ARCH__>=200
-                printf("%d \n", tid);
+                printf("tid: %d , id: %d\n", tid, id);
 
 #endif
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
