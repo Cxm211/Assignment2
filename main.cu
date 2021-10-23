@@ -204,7 +204,8 @@ int main(int argc, char *argv[])
     }
 
     // run the simulation
-    int warDeathToll = goi_cuda(GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z, nGenerations, startWorld, nRows, nCols, nInvasions, invasionTimes, invasionPlans);
+    int warDeathToll = goiCuda(GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z, nGenerations, startWorld, nRows,
+                               nCols, nInvasions, invasionTimes, invasionPlans);
 
     // output the result
     fprintf(outputFile, "%d", warDeathToll);
@@ -268,7 +269,7 @@ int readWorldLayout(FILE *fp, char **line, size_t *len, int *world, int nRows, i
                 return -1;
             }
 
-            GlobalsetValueAt(world, nRows, nCols, row, col, cell);
+            globalSetValueAt(world, nRows, nCols, row, col, cell);
             p = end;
         }
     }
