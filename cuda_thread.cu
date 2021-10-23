@@ -75,7 +75,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 {
     // we'll explicitly set if it was death due to fighting
     *diedDueToFighting = false;
-
+    cudaError_t rc;
     // faction of this cell
     int cellFaction = getValueAt(currWorld, nRows, nCols, row, col);
 
@@ -291,7 +291,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         dim3 gridDim(GRID_X,GRID_Y,GRID_Z);
         dim3 blockDim(BLOCK_X,BLOCK_Y, BLOCK_Z);
 
-        execute<<<gridDim, blockDim>>>(wholeNewWorld, world, inv, nRows, nCols);
+        execute<<<gridDim, blockDim>>>(wholeNewWorldCuda, worldCuda, invCuda, nRows, nCols);
         cudaDeviceSynchronize();
 
         cudaMemcpy(wholeNewWorld, wholeNewWorldCuda, sizeof(int) * nRows * nCols, cudaMemcpyDeviceToHost);
