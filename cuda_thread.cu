@@ -88,9 +88,9 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
 
     // tracks count of each faction adjacent to this cell
     int neighborCounts[MAX_FACTIONS];
-//    for(int i = 0; i < MAX_FACTIONS; i++)
-//        neighborCounts[i] = 0;
-    memset(neighborCounts, 0, MAX_FACTIONS * sizeof(int));
+    for(int i = 0; i < MAX_FACTIONS; i++)
+        neighborCounts[i] = 0;
+   // memset(neighborCounts, 0, MAX_FACTIONS * sizeof(int));
 
     // count neighbors (and self)
     for (int dy = -1; dy <= 1; dy++)
