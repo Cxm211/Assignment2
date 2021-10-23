@@ -20,7 +20,7 @@
 /**
  * Specifies the number(s) of live neighbors of the same faction required for a dead cell to become alive.
  */
-__device__ volatile int death[1000];
+__device__ __managed__ volatile int death[1000];
 
 __device__ bool isBirthable(int n)
 {
@@ -177,7 +177,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
                 if (diedDueToFighting){
-                    death[tid] ++;
+                    atomicAdd((float *) &death[tid], 1);
                 }
                 diedDueToFighting = false;
             }
@@ -304,16 +304,16 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         exportWorld(world, nRows, nCols);
 #endif
     }
-//    int host_death[num];
-//    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(host_death));
-//
-//    if (rc != cudaSuccess)
-//    {
-//        printf("Could not copy from device. Reason: %s\n", cudaGetErrorString(rc));
-//    }
-//    for (int i = 0; i < num; i++){
-//        deathToll += host_death[i];
-//    }
+    int host_death[num];
+    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(host_death));
+
+    if (rc != cudaSuccess)
+    {
+        printf("Could not copy from device. Reason: %s\n", cudaGetErrorString(rc));
+    }
+    for (int i = 0; i < num; i++){
+        deathToll += host_death[i];
+    }
     free(world);
     return deathToll;
 }
