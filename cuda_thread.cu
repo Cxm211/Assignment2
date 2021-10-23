@@ -252,7 +252,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         }
 
         // create the next world state
-        int *wholeNewWorld = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
+        void *wholeNewWorld = (malloc(sizeof(int) * nRows * nCols));
         if (wholeNewWorld == NULL)
         {
             if (inv != NULL)
