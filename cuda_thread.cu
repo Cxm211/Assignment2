@@ -177,7 +177,7 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
                 int nextState = getNextState(currWorld, invaders, nRows, nCols, row, col, &diedDueToFighting);
                 setValueAt(wholeNewWorld, nRows, nCols, row, col, nextState);
                 if (diedDueToFighting){
-                    atomicAdd((float *) &death[tid], 1);
+                    death[tid]++;
                 }
                 diedDueToFighting = false;
             }
@@ -304,8 +304,8 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         exportWorld(world, nRows, nCols);
 #endif
     }
-    int host_death[num];
-    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(host_death));
+    int host_death[1000];
+    cudaError_t rc = cudaMemcpyFromSymbol(&host_death, death, sizeof(1000));
 
     if (rc != cudaSuccess)
     {
