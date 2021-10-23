@@ -10,7 +10,7 @@
 #include "exporter.h"
 #include "settings.h"
 
-// including the "dead faction": 0
+//  including the "dead faction": 0
 #define MAX_FACTIONS 10
 
 // this macro is here to make the code slightly more readable, not because it can be safely changed to
