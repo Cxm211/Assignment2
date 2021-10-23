@@ -179,7 +179,6 @@ __global__ void execute( int * wholeNewWorld, const int *currWorld, const int *i
                 if (diedDueToFighting){
                     death[tid]++;
                 }
-                printf("Next: %d", nextState);
                 diedDueToFighting = false;
             }
         }
@@ -271,6 +270,7 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
         execute<<<gridDim, blockDim>>> (wholeNewWorld, world, inv, nRows, nCols );
         cudaDeviceSynchronize();
 
+        printWorld(wholeNewWorld,  nRows,  nCols);
 //        cudaMemcpy(death, deathNum, num, cudaMemcpyDeviceToHost);
         // get new states for each cell
 //        for (int row = 0; row < nRows; row++)
