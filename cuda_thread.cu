@@ -101,7 +101,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
             if (faction >= DEAD_FACTION)
             {
                 neighborCounts[faction]++;
-                printf("NEIGHBOR: %d", neighborCounts[faction]);
+               //printf("NEIGHBOR: %d", neighborCounts[faction]);
             }
         }
     }
@@ -121,7 +121,7 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
         for (int faction = DEAD_FACTION + 1; faction < MAX_FACTIONS; faction++)
         {
             int count = neighborCounts[faction];
-
+            printf("COUNT: %d", count);
             if (isBirthable(count))
             {
                 newFaction = faction;
