@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    inputFile = fopen(argv[1], "r");
+    inputFile = fopen(argv[1], "gridSize");
     if (inputFile == NULL)
     {
         fprintf(stderr, "Failed to open %s for reading. Aborting...\n", argv[1]);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Parse size
+    // Parse gridSize
     if (sscanf(argv[3], "%d", &GRID_X) != 1 )
     {
         fprintf(stderr, "Failed to parse <GRID_X> as positive integer. Got '%s'. Aborting...\n", argv[3]);
