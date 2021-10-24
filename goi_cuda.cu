@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <pthread.h>
-#include "cuda_thread.h"
+#include "goi_cuda.h"
 #include "util.h"
 #include "exporter.h"
 #include "settings.h"
