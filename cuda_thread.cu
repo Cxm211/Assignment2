@@ -152,6 +152,25 @@ __device__ int getNextState(const int *currWorld, const int *invaders, int nRows
     }
 }
 
+__global__ void worldCreation(int i, int nRows, int nCols, int nInvasions, const int *invasionTimes,
+                              int **invasionPlans){
+    // is there an invasion this generation?
+    int *inv = NULL;
+    if (invasionIndex < nInvasions && i == invasionTimes[invasionIndex]) {
+        // we make a copy because we do not own invasionPlans
+        inv = static_cast<int *>(malloc(sizeof(int) * nRows * nCols));
+        if (inv == NULL) {
+            free(world);
+            return -1;
+        }
+        for (int row = 0; row < nRows; row++) {
+            for (int col = 0; col < nCols; col++) {
+                globalSetValueAt(inv, nRows, nCols, row, col,
+                                 globalGetValueAt(invasionPlans[invasionIndex], nRows, nCols, row, col));
+            }
+        }
+        atomicAdd(&invasionIndex, 1);
+    }
 
 __global__ void
 execute(int *wholeNewWorld, const int *currWorld, const int *invaders, int nRows, int nCols, int eachThreadWork) {
@@ -222,6 +241,9 @@ int goi_cuda(int GRID_X, int GRID_Y, int GRID_Z, int BLOCK_X, int BLOCK_Y, int B
             GlobalsetValueAt(world, nRows, nCols, row, col, GlobalgetValueAt(startWorld, nRows, nCols, row, col));
         }
     }
+    int *worldCuda;
+    cudaMalloc((void **) &worldCuda, sizeof(int) * nRows * nCols);
+    cudaMemcpy(worldCuda, world, sizeof(int) * nRows * nCols, cudaMemcpyHostToDevice);
 
     int *worldCuda;
     cudaMalloc((void **) &worldCuda, sizeof(int) * nRows * nCols);

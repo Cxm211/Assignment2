@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    inputFile = fopen(argv[1], "r");
+    inputFile = fopen(argv[1], "gridSize");
     if (inputFile == NULL)
     {
         fprintf(stderr, "Failed to open %s for reading. Aborting...\n", argv[1]);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Parse size
+    // Parse gridSize
     if (sscanf(argv[3], "%d", &GRID_X) != 1 )
     {
         fprintf(stderr, "Failed to parse <GRID_X> as positive integer. Got '%s'. Aborting...\n", argv[3]);
@@ -204,7 +204,8 @@ int main(int argc, char *argv[])
     }
 
     // run the simulation
-    int warDeathToll = goi_cuda(GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z, nGenerations, startWorld, nRows, nCols, nInvasions, invasionTimes, invasionPlans);
+    int warDeathToll = goiCuda(GRID_X, GRID_Y, GRID_Z, BLOCK_X, BLOCK_Y, BLOCK_Z, nGenerations, startWorld, nRows,
+                               nCols, nInvasions, invasionTimes, invasionPlans);
 
     // output the result
     fprintf(outputFile, "%d", warDeathToll);
@@ -268,7 +269,7 @@ int readWorldLayout(FILE *fp, char **line, size_t *len, int *world, int nRows, i
                 return -1;
             }
 
-            GlobalsetValueAt(world, nRows, nCols, row, col, cell);
+            globalSetValueAt(world, nRows, nCols, row, col, cell);
             p = end;
         }
     }
